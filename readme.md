@@ -144,6 +144,8 @@ chatbot-furia
    npm run dev
    ```
 
+[Assista ao vídeo mostrando como rodar](https://drive.google.com/file/d/1F5n5u_4LPr0EhzODQp9xMtJ3gIotUKuf/view?usp=sharing)
+
 ---
 
 ### Acessando o Chatbot
@@ -167,6 +169,9 @@ Aqui estão alguns exemplos de comandos que o chatbot entende:
 - **Campeonatos Atuais**: "Quais campeonatos estão rolando?"
 - **Campeonatos Futuros**: "Quais são os próximos campeonatos?"
 - **Estatísticas de Jogadores**: "Quais são as estatísticas do jogador [nome]?"
+
+
+[Assista ao vídeo de funcionamento do ChatBot](https://drive.google.com/file/d/1VfLtNuTj5rxNgKKWLnjZJH7uc2ol3Ejk/view?usp=drive_link)
 
 ---
 
@@ -285,6 +290,8 @@ chatbot-furia
    uvicorn main:app --reload
    ```
 
+[Watch the video showing how to run](https://drive.google.com/file/d/1F5n5u_4LPr0EhzODQp9xMtJ3gIotUKuf/view?usp=sharing)
+
 ### Frontend Setup
 
 1. Navigate to the `frontend` folder:
@@ -325,6 +332,8 @@ Here are some examples of commands the chatbot understands:
 - **Current Tournaments**: "What tournaments are happening?"
 - **Future Tournaments**: "What are the next tournaments?"
 - **Player Statistics**: "What are the stats for player [name]?"
+
+[Watch the video showing the Chatbot working](https://drive.google.com/file/d/1VfLtNuTj5rxNgKKWLnjZJH7uc2ol3Ejk/view?usp=drive_link)
 
 </details>
 
