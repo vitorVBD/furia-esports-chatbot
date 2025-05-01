@@ -26,6 +26,12 @@
 
 O **Chatbot Furioso** é uma aplicação web que permite aos usuários interagir com um chatbot para obter informações sobre o time FURIA Esports e o cenário competitivo de CS. Ele responde a perguntas sobre próximos jogos, resultados de partidas, estatísticas de jogadores, mapas, armas, campeonatos e muito mais.
 
+Sempre acompanhei esports desde que me entendo por gente — CS, Rainbow Six, LoL, Valorant, Rocket League... Sempre estive ligado em todas as modalidades. Mas uma coisa sempre me incomodou: a dificuldade de encontrar informações centralizadas. Datas de partidas, lineups dos times, campeonatos acontecendo... era sempre muita aba aberta e muita pesquisa.
+
+Pensando nisso, decidi criar algo para resolver esse problema: um chatbot interativo que reúne todas essas informações em um só lugar. O projeto é totalmente escalável, podendo ser adicionado quantas modalidades quiserem e quantos times quisere, mas encontrei um desafio: Conseguir uma API de esports gratuita e de qualidade.
+
+Com acesso à uma API como a da Liquipedia, esse chatbot seria algo que eu sempre quis como fã de esports!
+
 ---
 
 ## Estrutura do Projeto
@@ -188,6 +194,12 @@ Aqui estão alguns exemplos de comandos que o chatbot entende:
 ## Project Summary
 
 The **Chatbot Furioso** is a web application that allows users to interact with a chatbot to get information about the FURIA Esports team and the competitive CS scene. It answers questions about upcoming games, match results, player statistics, maps, weapons, tournaments, and more.
+
+I have always followed esports for as long as I can remember — CS, Rainbow Six, LoL, Valorant, Rocket League... I've always been connected to all these games. But one thing always bothered me: the difficulty of finding centralized information. Match schedules, team lineups, ongoing tournaments... it was always too many tabs open and too much searching.
+
+With that in mind, I decided to create something to solve this problem: an interactive chatbot that gathers all this information in one place. The project is fully scalable, allowing as many games and teams as desired to be added, but I encountered a challenge: finding a free and high-quality esports API.
+
+With access to an API like Liquipedia's, this chatbot would be something I always wanted as an esports fan!
 
 ---
 
