@@ -14,6 +14,12 @@
 
 ---
 
+#### O ChatBot Furioso agora possui uma segunda versão, usando RAG e IA para NLP (Ainda instável). Veja a branch chatbot-v2-unstable
+
+#### The Furioso ChatBot now has a second version, using RAG and AI for NLP (Still unstable). Check out the chatbot-v2-unstable branch.
+
+---
+
 <details> <summary>🇧🇷 Detalhes do Projeto (Português)</summary>
 
 ## Resumo do Projeto
