@@ -1,15 +1,15 @@
 <p align="center">
   <img src="./frontend/src/assets/Furia_Esports_logo.png" alt="Chatbot Furioso" width="150" /> <br />
   <b>Chatbot Furioso</b> <br />
-  <sub><sup><b>(CHATBOT-FURIA)</b></sup></sub> <br />
+  <sub><sup><b>(CHATBOT-FURIA V2)</b></sup></sub> <br />
 </p>
 
 <p align="center">
-  Este projeto é um chatbot interativo desenvolvido para fornecer informações sobre o time de esports FURIA, o jogo Counter-Strike, campeonatos, partidas e muito mais. O chatbot utiliza React no frontend e Python + FastAPI no backend, integrando-se à API da PandaScore para obter dados em tempo real.
+  Este projeto é um chatbot interativo desenvolvido para fornecer informações sobre o time de esports FURIA, o jogo Counter-Strike, campeonatos, partidas e muito mais. O chatbot agora utiliza RAG (Retrieval-Augmented Generation) e IA avançada para NLP, combinando React no frontend e Python + FastAPI no backend, integrando-se à API da PandaScore para obter dados em tempo real.
 </p>
 
 <p align="center">
-  This project is an interactive chatbot designed to provide information about the FURIA esports team, the game Counter-Strike, tournaments, matches, and more. The chatbot uses React for the frontend and Python + FastAPI for the backend, integrating with the PandaScore API to fetch real-time data.
+  This project is an interactive chatbot designed to provide information about the FURIA esports team, the game Counter-Strike, tournaments, matches, and more. The chatbot now uses RAG (Retrieval-Augmented Generation) and advanced AI for NLP, combining React for the frontend and Python + FastAPI for the backend, integrating with the PandaScore API to fetch real-time data.
 </p>
 
 ---
@@ -18,7 +18,7 @@
 
 ## Resumo do Projeto
 
-O **Chatbot Furioso** é uma aplicação web que permite aos usuários interagir com um chatbot para obter informações sobre o time FURIA Esports e o cenário competitivo de CS. Ele responde a perguntas sobre próximos jogos, resultados de partidas, estatísticas de jogadores, mapas, armas, campeonatos e muito mais.
+O **Chatbot Furioso V2** é uma aplicação web que permite aos usuários interagir com um chatbot para obter informações sobre o time FURIA Esports e o cenário competitivo de CS. Ele responde a perguntas sobre próximos jogos, resultados de partidas, estatísticas de jogadores, mapas, armas, campeonatos e muito mais. Agora, com a implementação de RAG e IA para NLP, o chatbot oferece respostas mais precisas e contextualizadas, utilizando um índice FAISS para recuperação de informações.
 
 ---
 
@@ -30,6 +30,9 @@ O **Chatbot Furioso** é uma aplicação web que permite aos usuários interagir
 chatbot-furia  
 ├── backend  
 │   ├── main.py  
+│   ├── services/  
+│   │   ├── populate_faiss.py  
+│   │   └── faiss_retrieval.py  
 │   ├── requirements.txt  
 │   └── pycache/  
 ├── frontend  
@@ -59,6 +62,8 @@ chatbot-furia
 ### Backend
 
 - **`main.py`**: Contém a API desenvolvida com FastAPI, responsável por fornecer dados ao chatbot.
+- **`services/populate_faiss.py`**: Script para criar e popular o índice FAISS com dados relevantes.
+- **`services/faiss_retrieval.py`**: Implementação do mecanismo de recuperação de informações utilizando FAISS e integração com o modelo de linguagem.
 - **`requirements.txt`**: Lista de dependências do backend.
 
 ### Frontend
@@ -80,6 +85,8 @@ chatbot-furia
 - **Armas**: Informações sobre as armas do jogo.
 - **Campeonatos**: Detalhes sobre campeonatos em andamento e futuros.
 - **Sobre a FURIA**: Informações gerais sobre a organização FURIA Esports.
+- **Respostas Contextualizadas**: Utiliza RAG para fornecer respostas baseadas em informações recuperadas do índice FAISS.
+- **Integração com IA**: Respostas geradas por um modelo de linguagem avançado.
 
 ---
 
@@ -96,6 +103,8 @@ chatbot-furia
 - **FastAPI**: Framework para construção de APIs rápidas e performáticas.
 - **Uvicorn**: Servidor ASGI para rodar a aplicação FastAPI.
 - **Requests**: Biblioteca para realizar requisições HTTP.
+- **FAISS**: Biblioteca para criação de índices vetoriais e recuperação de informações.
+- **HuggingFace Transformers**: Para embeddings e geração de respostas.
 
 ### API Utilizada
 
@@ -122,7 +131,12 @@ chatbot-furia
    pip install -r requirements.txt
    ```
 
-3. Inicie o servidor:
+3. Crie o índice FAISS:
+   ```bash
+   python services/populate_faiss.py
+   ```
+
+4. Inicie o servidor:
    ```bash
    uvicorn main:app --reload
    ```
@@ -143,8 +157,6 @@ chatbot-furia
    ```bash
    npm run dev
    ```
-
-[Assista ao vídeo mostrando como rodar](https://drive.google.com/file/d/1F5n5u_4LPr0EhzODQp9xMtJ3gIotUKuf/view?usp=sharing)
 
 ---
 
@@ -169,9 +181,7 @@ Aqui estão alguns exemplos de comandos que o chatbot entende:
 - **Campeonatos Atuais**: "Quais campeonatos estão rolando?"
 - **Campeonatos Futuros**: "Quais são os próximos campeonatos?"
 - **Estatísticas de Jogadores**: "Quais são as estatísticas do jogador [nome]?"
-
-
-[Assista ao vídeo de funcionamento do ChatBot](https://drive.google.com/file/d/1VfLtNuTj5rxNgKKWLnjZJH7uc2ol3Ejk/view?usp=drive_link)
+- **Comandos**: "comandos" (lista todos os comandos disponíveis).
 
 ---
 
@@ -181,7 +191,7 @@ Aqui estão alguns exemplos de comandos que o chatbot entende:
 
 ## Project Summary
 
-The **Chatbot Furioso** is a web application that allows users to interact with a chatbot to get information about the FURIA Esports team and the competitive CS scene. It answers questions about upcoming games, match results, player statistics, maps, weapons, tournaments, and more.
+The **Chatbot Furioso V2** is a web application that allows users to interact with a chatbot to get information about the FURIA Esports team and the competitive CS scene. It answers questions about upcoming games, match results, player statistics, maps, weapons, tournaments, and more. Now, with the implementation of RAG and AI for NLP, the chatbot provides more accurate and contextualized responses using a FAISS index for information retrieval.
 
 ---
 
@@ -193,6 +203,9 @@ The **Chatbot Furioso** is a web application that allows users to interact with 
 chatbot-furia  
 ├── backend  
 │   ├── main.py  
+│   ├── services/  
+│   │   ├── populate_faiss.py  
+│   │   └── faiss_retrieval.py  
 │   ├── requirements.txt  
 │   └── pycache/  
 ├── frontend  
@@ -222,6 +235,8 @@ chatbot-furia
 ### Backend
 
 - **`main.py`**: Contains the API developed with FastAPI, responsible for providing data to the chatbot.
+- **`services/populate_faiss.py`**: Script to create and populate the FAISS index with relevant data.
+- **`services/faiss_retrieval.py`**: Implementation of the retrieval mechanism using FAISS and integration with the language model.
 - **`requirements.txt`**: List of backend dependencies.
 
 ### Frontend
@@ -243,26 +258,8 @@ chatbot-furia
 - **Weapons**: Information about the game's weapons.
 - **Tournaments**: Details about ongoing and upcoming tournaments.
 - **About FURIA**: General information about the FURIA Esports organization.
-
----
-
-## Technologies and Tools Used
-
-### Frontend
-
-- **React**: JavaScript library for building user interfaces.
-- **Vite**: Fast build tool for frontend projects.
-- **CSS**: Styling for the interface.
-
-### Backend
-
-- **FastAPI**: Framework for building fast and performant APIs.
-- **Uvicorn**: ASGI server to run the FastAPI application.
-- **Requests**: Library for making HTTP requests.
-
-### API Used
-
-- **PandaScore API**: API used to fetch data about teams, matches, players, maps, and CS2 tournaments.
+- **Contextualized Responses**: Uses RAG to provide answers based on information retrieved from the FAISS index.
+- **AI Integration**: Responses generated by an advanced language model.
 
 ---
 
@@ -285,12 +282,15 @@ chatbot-furia
    pip install -r requirements.txt
    ```
 
-3. Start the server:
+3. Create the FAISS index:
+   ```bash
+   python services/populate_faiss.py
+   ```
+
+4. Start the server:
    ```bash
    uvicorn main:app --reload
    ```
-
-[Watch the video showing how to run](https://drive.google.com/file/d/1F5n5u_4LPr0EhzODQp9xMtJ3gIotUKuf/view?usp=sharing)
 
 ### Frontend Setup
 
@@ -332,6 +332,7 @@ Here are some examples of commands the chatbot understands:
 - **Current Tournaments**: "What tournaments are happening?"
 - **Future Tournaments**: "What are the next tournaments?"
 - **Player Statistics**: "What are the stats for player [name]?"
+- **Commands**: "commands" (lists all available commands).
 
 [Watch the video showing the Chatbot working](https://drive.google.com/file/d/1VfLtNuTj5rxNgKKWLnjZJH7uc2ol3Ejk/view?usp=drive_link)
 

@@ -1,6 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
+from services.faiss_retrieval import initialize_retrieval_qa
 import requests
+
+API_KEY = "VyuJGyw9ejTo66QJLPuD5eRsXVTiR3302URgCmKNzwpnMZN3j48"
+headers = {"Authorization": f"Bearer {API_KEY}"}
 
 app = FastAPI()
 
@@ -13,29 +18,168 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-API_KEY = "VyuJGyw9ejTo66QJLPuD5eRsXVTiR3302URgCmKNzwpnMZN3j48"
-headers = {"Authorization": f"Bearer {API_KEY}"}
+# Modelo para validar o corpo da requisição
+class QuestionRequest(BaseModel):
+    question: str
 
+qa_chain = initialize_retrieval_qa()
 
-@app.get("/next-match")
-def next_match():
-    team_search = requests.get("https://api.pandascore.co/csgo/teams", headers=headers, params={"search[name]": "FURIA"}).json()
-    if not team_search:
-        return {"error": "FURIA não encontrada"}
-    furia_id = team_search[0]["id"]
+@app.post("/ask")
+def ask_question(request: QuestionRequest):
+    try:
+        # Verifica se o comando é "comandos"
+        if request.question.lower() == "comandos":
+            return {
+                "answer": (
+                    "Comandos disponíveis:\n"
+                    "- 'próximo jogo': Informa o próximo jogo da FURIA.\n"
+                    "- 'lineup masculina': Mostra a lineup masculina da FURIA.\n"
+                    "- 'último jogo': Mostra informações sobre o último jogo.\n"
+                    "- 'estatísticas': Mostra estatísticas de um jogador.\n"
+                    "- 'mapas': Lista os mapas disponíveis.\n"
+                    "- 'próximos três jogos': Lista os próximos três jogos.\n"
+                    "- 'torneios atuais': Lista os torneios em andamento.\n"
+                    "- 'próximos torneios': Lista os próximos torneios.\n"
+                    "- 'armas': Lista as armas disponíveis no jogo."
+                )
+            }
 
-    matches = requests.get("https://api.pandascore.co/csgo/matches/upcoming", headers=headers).json()
-    furia_matches = [m for m in matches if any(o["opponent"]["id"] == furia_id for o in m["opponents"])]
+        # Verifica se o comando é "lineup masculina"
+        if request.question.lower() == "lineup masculina":
+            response = requests.get("http://127.0.0.1:8000/lineup?gender=masculino")
+            lineup_data = response.json()
 
-    if furia_matches:
-        match = furia_matches[0]
-        return {
-            "name": match["name"],
-            "date": match["begin_at"],
-            "opponents": [op["opponent"]["name"] for op in match["opponents"]]
-        }
-    else:
-        return {"message": "Nenhuma partida futura encontrada."}
+            if "lineup" in lineup_data:
+                context = f"A lineup masculina da FURIA é composta pelos seguintes jogadores: {', '.join(lineup_data['lineup'])}."
+            else:
+                context = lineup_data.get("error", "Não foi possível obter a lineup masculina da FURIA.")
+
+            llm_response = qa_chain.run(f"Pergunta: {request.question}. Contexto: {context}")
+            return {"answer": llm_response}
+        
+        # Verifica se o comando é "lineup masculina"
+        if request.question.lower() == "lineup feminina":
+            response = requests.get("http://127.0.0.1:8000/lineup?gender=feminino")
+            lineup_data = response.json()
+
+            if "lineup" in lineup_data:
+                context = f"A lineup feminina da FURIA é composta pelos seguintes jogadores: {', '.join(lineup_data['lineup'])}."
+            else:
+                context = lineup_data.get("error", "Não foi possível obter a lineup feminina da FURIA.")
+
+            llm_response = qa_chain.run(f"Pergunta: {request.question}. Contexto: {context}")
+            return {"answer": llm_response}
+
+        # Verifica se o comando é "último jogo"
+        if request.question.lower() == "último jogo":
+            response = requests.get("http://127.0.0.1:8000/last-match")
+            match_data = response.json()
+
+            if "last_match" in match_data:
+                context = f"O último jogo da FURIA foi: {match_data['last_match']}."
+            else:
+                context = match_data.get("error", "Não foi possível obter informações sobre o último jogo.")
+
+            llm_response = qa_chain.run(f"{request.question}. Contexto: {context}")
+            return {"answer": llm_response}
+
+        # Verifica se o comando é "estatísticas"
+        if request.question.lower().startswith("estatísticas"):
+            player_name = request.question.split("estatísticas de")[-1].strip()
+            response = requests.get(f"http://127.0.0.1:8000/player-stats?player_name={player_name}")
+            stats_data = response.json()
+
+            if "player" in stats_data:
+                context = (
+                    f"Estatísticas de {stats_data['player']}:\n"
+                    f"Kills: {stats_data['kills']}, Deaths: {stats_data['deaths']}, ADR: {stats_data['adr']}."
+                )
+            else:
+                context = stats_data.get("error", f"Não foi possível obter estatísticas para {player_name}.")
+
+            llm_response = qa_chain.run(f"{request.question}. Contexto: {context}")
+            return {"answer": llm_response}
+
+        # Verifica se o comando é "mapas"
+        if request.question.lower() == "mapas":
+            response = requests.get("http://127.0.0.1:8000/maps")
+            maps_data = response.json()
+
+            if "maps" in maps_data:
+                context = f"Os mapas disponíveis no jogo são: {', '.join(maps_data['maps'])}."
+            else:
+                context = maps_data.get("error", "Não foi possível obter os mapas disponíveis.")
+
+            # Passa o contexto para o LLM
+            llm_response = qa_chain.run(f"Pergunta: {request.question}. Contexto: {context}")
+            return {"answer": llm_response}
+
+        # Verifica se o comando é "próximos três jogos"
+        if request.question.lower() == "próximos três jogos":
+            response = requests.get("http://127.0.0.1:8000/next-three-matches")
+            matches_data = response.json()
+
+            if "matches" in matches_data:
+                context = "Os próximos três jogos da FURIA são:\n" + "\n".join(
+                    [f"{match['name']} - {match['date']}" for match in matches_data["matches"]]
+                )
+            else:
+                context = matches_data.get("error", "Não foi possível obter informações sobre os próximos jogos.")
+
+            llm_response = qa_chain.run(f"{request.question}. Contexto: {context}")
+            return {"answer": llm_response}
+
+        # Verifica se o comando é "torneios atuais"
+        if request.question.lower() == "torneios atuais":
+            response = requests.get("http://127.0.0.1:8000/current-tournaments")
+            tournaments_data = response.json()
+
+            if "tournaments" in tournaments_data:
+                context = "Os torneios em andamento são:\n" + "\n".join(
+                    [f"{tournament['name']} - {tournament['stage']}" for tournament in tournaments_data["tournaments"]]
+                )
+            else:
+                context = tournaments_data.get("error", "Não foi possível obter informações sobre os torneios atuais.")
+
+            llm_response = qa_chain.run(f"{request.question}. Contexto: {context}")
+            return {"answer": llm_response}
+
+        # Verifica se o comando é "próximos torneios"
+        if request.question.lower() == "próximos torneios":
+            response = requests.get("http://127.0.0.1:8000/upcoming-tournaments")
+            tournaments_data = response.json()
+
+            if "tournaments" in tournaments_data:
+                context = "Os próximos torneios são:\n" + "\n".join(
+                    [f"{tournament['name']} - {tournament['start_date']}" for tournament in tournaments_data["tournaments"]]
+                )
+            else:
+                context = tournaments_data.get("error", "Não foi possível obter informações sobre os próximos torneios.")
+
+            llm_response = qa_chain.run(f"{request.question}. Contexto: {context}")
+            return {"answer": llm_response}
+
+        # Verifica se o comando é "armas"
+        if request.question.lower() == "armas":
+            response = requests.get("http://127.0.0.1:8000/game-weapons")
+            weapons_data = response.json()
+
+            if "weapons" in weapons_data:
+                context = "As armas disponíveis no jogo são:\n" + "\n".join(
+                    [f"{weapon['name']} ({weapon['kind']})" for weapon in weapons_data["weapons"]]
+                )
+            else:
+                context = weapons_data.get("error", "Não foi possível obter informações sobre as armas.")
+
+            llm_response = qa_chain.run(f"{request.question}. Contexto: {context}")
+            return {"answer": llm_response}
+
+        # Caso contrário, processa a pergunta normalmente
+        response = qa_chain.run(request.question)
+        return {"answer": response}
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/lineup")
 def get_lineup(gender: str = "masculino"):
@@ -63,53 +207,6 @@ def get_lineup(gender: str = "masculino"):
     lineup = [player["name"] or player["first_name"] for player in players]
 
     return {"lineup": lineup, "team_name": team["name"]}
-
-@app.get("/last-match")
-def last_match(gender: str = "masculino"):
-    teams = requests.get(
-        "https://api.pandascore.co/csgo/teams",
-        headers=headers,
-        params={"search[name]": "FURIA"}
-    ).json()
-
-    if not teams:
-        return {"error": "FURIA não encontrada"}
-
-    if gender == "masculino":
-        team = next((t for t in teams if t.get("acronym") == "FURIA" and not t["name"].lower().endswith("fe")), None)
-    elif gender == "feminino":
-        team = next((t for t in teams if "fe" in t["name"].lower()), None)
-    else:
-        return {"error": "Gênero inválido. Use masculino ou feminino."}
-
-    if not team:
-        return {"error": f"Time {gender} da FURIA não encontrado"}
-
-    response = requests.get(
-        f"https://api.pandascore.co/csgo/matches/past?filter[team]={team['id']}",
-        headers=headers
-    )
-    matches = response.json().get("data", [])
-
-    if not matches:
-        return {"message": f"Nenhum resultado encontrado para o time {team['name']}."}
-
-    filtered_matches = [
-    match for match in matches
-    if isinstance(match, dict) and match.get("opponents") and
-       any(isinstance(op, dict) and op.get("opponent", {}).get("name") == team["name"] for op in match["opponents"])
-]
-
-    if not filtered_matches:
-        return {"message": f"Nenhum resultado encontrado para o time {team['name']}."}
-
-    match = filtered_matches[0]
-
-    return {
-        "match_name": match["name"],
-        "result": f"{match['opponents'][0]['opponent']['name']} {match['results'][0]['score']} x {match['results'][1]['score']} {match['opponents'][1]['opponent']['name']}",
-        "date": match["begin_at"]
-    }
 
 @app.get("/player-stats")
 def player_stats(player_name: str, gender: str = "masculino"):
